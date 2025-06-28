@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container"> {/* Use class from shared-styles.css */}
+  <div class="app-container">
     <nav>
       <router-link to="/" class="nav-link" active-class="active">Dashboard</router-link>
       <router-link to="/posts" class="nav-link" active-class="active">Posts</router-link>

@@ -7,13 +7,13 @@ import PostDetail from './components/PostDetail';
 function App() {
   return (
     <Router>
-      <div className="app-container"> {/* Use class from shared-styles.css */}
+      <div className="app-container">
         <nav>
           {/* Use NavLink for active class styling, and apply .nav-link for shared styles */}
-          <NavLink to="/" className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}>
+          <NavLink to="/" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
             Dashboard
           </NavLink>
-          <NavLink to="/posts" className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}>
+          <NavLink to="/posts" className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}>
             Posts
           </NavLink>
         </nav>
