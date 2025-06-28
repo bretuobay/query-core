@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "query-core-client": "^0.0.2",
+    "query-core-client": "^0.0.3",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
   },
