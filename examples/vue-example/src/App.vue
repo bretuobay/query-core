@@ -1,8 +1,8 @@
 <template>
-  <div id="app-container">
+  <div class="app-container">
     <nav>
-      <router-link to="/">Dashboard</router-link>
-      <router-link to="/posts">Posts</router-link>
+      <router-link to="/" class="nav-link" active-class="active">Dashboard</router-link>
+      <router-link to="/posts" class="nav-link" active-class="active">Posts</router-link>
     </nav>
     <main>
       <router-view />
@@ -11,61 +11,20 @@
 </template>
 
 <script setup lang="ts">
-// No script logic needed in App.vue anymore as it's handled by individual routed components
+// No script logic needed in App.vue
 </script>
 
 <style>
-/* Global styles can remain here or be moved to a more global CSS file like main.css or style.css */
-body {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  margin: 0;
-  background-color: #f4f4f4; /* Added background for better contrast with app container */
-}
+/* Remove component-specific styles from App.vue if they are now covered by shared-styles.css */
+/* For example, if #app-container and nav styles from shared-styles.css are sufficient,
+   the <style> block in App.vue can be emptied or removed. */
 
-#app-container {
-  max-width: 960px; /* Increased max-width for better layout */
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+/* If style.css or main.css (imported in main.ts) handles global body styles,
+   those can also be removed from here. */
 
-nav {
-  display: flex;
-  justify-content: flex-start; /* Align to the left */
-  align-items: center;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-}
+/* Keep this style block if there are styles specific ONLY to App.vue's template
+   that aren't part of the shared design system. */
 
-nav a {
-  margin-right: 20px; /* Spacing between items */
-  text-decoration: none;
-  color: #007bff;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-
-nav a:last-child {
-  margin-right: 0;
-}
-
-nav a.router-link-exact-active {
-  background-color: #e9ecef;
-  color: #0056b3;
-}
-
-nav a:hover {
-  background-color: #f8f9fa;
-}
-
-main {
-  /* Styles for the main content area where router-view renders */
-}
+/* It's good practice to rely on the cascade and specificity from shared-styles.css
+   and global style sheets (like style.css) first. */
 </style>

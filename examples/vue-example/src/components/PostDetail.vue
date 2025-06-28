@@ -1,15 +1,16 @@
 <template>
   <div class="post-detail-container">
-    <div v-if="isLoading">Loading post details...</div>
-    <div v-else-if="isError">Error fetching post: {{ error?.message || 'Unknown error' }}</div>
+    <div v-if="isLoading" class="text-center mt-2">Loading post details...</div>
+    <div v-else-if="isError" class="text-center mt-2 error-message">
+      Error fetching post: {{ error?.message || 'Unknown error' }}
+    </div>
     <div v-else-if="post">
       <h1>{{ post.title }}</h1>
       <p>{{ post.body }}</p>
-      <small>User ID: {{ post.userId }}</small>
-      <br />
-      <small>Post ID: {{ post.id }}</small>
+      <small class="post-meta">User ID: {{ post.userId }}</small>
+      <small class="post-meta">Post ID: {{ post.id }}</small>
     </div>
-    <div v-else>Post not found.</div>
+    <div v-else class="text-center mt-2">Post not found.</div>
   </div>
 </template>
 
@@ -98,27 +99,16 @@ const post = computed(() => postState.value.data);
 </script>
 
 <style scoped>
-.post-detail-container {
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-.post-detail-container h1 {
-  font-size: 1.8em;
-  color: #222;
-  margin-bottom: 10px;
-}
-.post-detail-container p {
-  font-size: 1em;
-  line-height: 1.6;
-  color: #444;
-  margin-bottom: 15px;
-}
-.post-detail-container small {
-  font-size: 0.85em;
-  color: #777;
+/* Scoped styles for PostDetail.vue can be removed if all styling
+   is handled by shared-styles.css or global styles.
+   The .post-detail-container class from shared-styles.css should cover the container styling.
+   If there are specific styles for this component that don't belong
+   in the shared system, they can remain here. */
+
+.post-meta { /* Example of a specific style that might remain if not in shared */
   display: block;
   margin-top: 5px;
+  font-size: 0.9em;
+  color: #666;
 }
 </style>

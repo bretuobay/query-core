@@ -1,17 +1,20 @@
 <template>
-  <div>
-    <h1>Posts</h1>
-    <div v-if="isLoading">Loading posts...</div>
-    <div v-else-if="isError">Error fetching posts: {{ error?.message || 'Unknown error' }}</div>
+  <div class="posts-list-container">
+    <h1 class="text-center mb-2">Posts</h1>
+    <div v-if="isLoading" class="text-center mt-2">Loading posts...</div>
+    <div v-else-if="isError" class="text-center mt-2 error-message">
+      Error fetching posts: {{ error?.message || 'Unknown error' }}
+    </div>
     <ul v-else-if="posts && posts.length > 0" class="posts-list">
       <li v-for="post in posts" :key="post.id">
         <router-link :to="`/posts/${post.id}`">
-          <h2>{{ post.title }}</h2>
+          {{ post.title }}
         </router-link>
-        <p>{{ post.body }}</p>
+        <!-- Optional: Add a snippet of post.body if desired -->
+        <!-- <p>{{ post.body.substring(0, 100) }}...</p> -->
       </li>
     </ul>
-    <div v-else>No posts found.</div>
+    <div v-else class="text-center mt-2">No posts found.</div>
   </div>
 </template>
 
@@ -61,27 +64,9 @@ const posts = computed(() => postsState.value.data);
 </script>
 
 <style scoped>
-.posts-list li {
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-.posts-list li h2 {
-  margin: 0 0 5px 0;
-  font-size: 1.2em;
-}
-.posts-list li p {
-  margin: 0;
-  font-size: 0.9em;
-  color: #555;
-}
-a {
-  text-decoration: none;
-  color: #007bff;
-}
-a:hover h2 {
-  text-decoration: underline;
-}
+/* Scoped styles for PostsList.vue can be removed if all styling
+   is handled by shared-styles.css or global styles.
+   The .posts-list class from shared-styles.css should cover the list styling.
+   If there are specific styles for this component that don't belong
+   in the shared system, they can remain here. */
 </style>
