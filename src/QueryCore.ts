@@ -152,7 +152,17 @@ class QueryCore {
     const endpoint = this.endpoints.get(endpointKey) as Endpoint<TData> | undefined;
     if (endpoint) {
       endpoint.state = { ...endpoint.state, ...partialState };
-      endpoint.subscribers.forEach(callback => callback({ ...endpoint.state })); // Notify with a copy of state
+      // Create a copy of the state for subscribers, with a deep copy for 'data'
+      const stateForSubscriber = { ...endpoint.state };
+      if (stateForSubscriber.data !== undefined) {
+        try {
+          stateForSubscriber.data = structuredClone(stateForSubscriber.data);
+        } catch (e) {
+          // Fallback or specific handling if structuredClone fails (e.g. for non-cloneable types)
+          console.warn(`QueryCore: Could not structured-clone data for endpoint ${endpointKey}. Subscribers will get a shallow copy of data.`, e);
+        }
+      }
+      endpoint.subscribers.forEach(callback => callback(stateForSubscriber));
     }
   }
 
@@ -286,7 +296,15 @@ class QueryCore {
   public getState<TData>(endpointKey: string): EndpointState<TData> {
     const endpoint = this.endpoints.get(endpointKey) as Endpoint<TData> | undefined;
     if (endpoint) {
-      return { ...endpoint.state }; // Return a copy to prevent direct mutation
+      const stateCopy = { ...endpoint.state };
+      if (stateCopy.data !== undefined) {
+        try {
+          stateCopy.data = structuredClone(stateCopy.data);
+        } catch (e) {
+          console.warn(`QueryCore: Could not structured-clone data for endpoint ${endpointKey} in getState. Returning shallow copy of data.`, e);
+        }
+      }
+      return stateCopy;
     }
     // Return a default "not found" or "initial" state if endpoint doesn't exist
     console.warn(`QueryCore: getState called for undefined endpoint "${endpointKey}". Returning default initial state.`);
