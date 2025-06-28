@@ -1,5 +1,5 @@
 // tests/mocks/mockIndexedDB.ts
-import { CachedItem } from '../../src/cacheProviders/CacheProvider'; // Adjust path as needed
+import { CachedItem } from '../cacheProviders/CacheProvider'; // Adjusted path
 
 interface MockIDBStore {
   [key: string]: { key: string; value: CachedItem<any> };
