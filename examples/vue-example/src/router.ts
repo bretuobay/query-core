@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from './components/Dashboard.vue';
 import PostsList from './components/PostsList.vue';
 import PostDetail from './components/PostDetail.vue';
 
-const routes: Array<RouteRecordRaw> = [
+const routes: Array<any> = [
   {
     path: '/',
     name: 'Dashboard',
