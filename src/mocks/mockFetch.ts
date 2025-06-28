@@ -1,8 +1,11 @@
 // tests/mocks/mockFetch.ts
 
-type FetchHandler = (url: RequestInfo | URL, options?: RequestInit) =>
-  Promise<Response> |
-  { data?: any; error?: any; ok?: boolean; status?: number; statusText?: string; headers?: Record<string, string> };
+type FetchHandler = (
+  url: RequestInfo | URL,
+  options?: RequestInit,
+) =>
+  | Promise<Response>
+  | { data?: any; error?: any; ok?: boolean; status?: number; statusText?: string; headers?: Record<string, string> };
 
 interface FetchCall {
   url: RequestInfo | URL;
@@ -40,7 +43,7 @@ export function mockFetch(handler?: FetchHandler) {
       ok = true,
       status = 200,
       statusText = 'OK',
-      headers = { 'Content-Type': 'application/json' }
+      headers = { 'Content-Type': 'application/json' },
     } = result;
 
     if (error) {

@@ -33,6 +33,7 @@
     "**/*.spec.ts",
     "tests",
     "__tests__",
-    "**/*.broken.ts"
+    "**/*.broken.ts",
+    "src/mocks/**"
   ]
 }

@@ -42,7 +42,7 @@ export class IndexedDBCacheProvider implements CacheProvider {
 
   private async performOperation<T>(
     mode: IDBTransactionMode,
-    operation: (store: IDBObjectStore) => Promise<T>
+    operation: (store: IDBObjectStore) => Promise<T>,
   ): Promise<T | undefined> {
     try {
       const db = await this.getDB();

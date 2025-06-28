@@ -3,7 +3,6 @@ import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   build: {
-    clearScreen: false,
     outDir: 'dist', // Explicitly set outDir
     lib: {
       entry: './src/index.ts',
@@ -12,11 +11,11 @@ export default defineConfig({
       fileName: (format) => `query-core.${format}.js`,
     },
     rollupOptions: {
-        // No external dependencies for QueryCore
-        output: {
-            // No globals needed as no externals
-        }
-    }
+      // No external dependencies for QueryCore
+      output: {
+        // No globals needed as no externals
+      },
+    },
   },
   plugins: [dts({ insertTypesEntry: true, outDir: 'dist', tsconfigPath: './tsconfig.json', rollupTypes: true })], // also specify for dts plugin
   server: {
