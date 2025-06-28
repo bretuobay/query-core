@@ -53,33 +53,36 @@ const Dashboard: React.FC = () => {
   }, []);
 
   if (postsState.isLoading) {
-    return <div>Loading dashboard data...</div>;
+    return <div className="text-center mt-2">Loading dashboard data...</div>;
   }
 
   if (postsState.isError) {
-    return <div>Error loading dashboard: {postsState.error?.message || 'Unknown error'}</div>;
+    return <div className="text-center mt-2 error-message">Error loading dashboard: {postsState.error?.message || 'Unknown error'}</div>;
   }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <div className="dashboard-card">
-        <h2>Total Posts</h2>
-        {postsState.data ? <p>{postsState.data.length}</p> : <p>0</p>}
+    <div className="dashboard-container">
+      <div className="card">
+        <h2 className="card-title">Total Posts</h2>
+        <div className="card-content">
+          {postsState.data ? <p>{postsState.data.length}</p> : <p>0</p>}
+        </div>
       </div>
-      <div className="dashboard-card">
-        <h2>Posts per User</h2>
-        {Object.keys(userPostCounts).length > 0 ? (
-          <ul>
-            {Object.entries(userPostCounts).map(([userId, count]) => (
-              <li key={userId}>
-                User ID {userId}: {count} posts
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No user post data available.</p>
-        )}
+      <div className="card">
+        <h2 className="card-title">Posts per User</h2>
+        <div className="card-content">
+          {Object.keys(userPostCounts).length > 0 ? (
+            <ul>
+              {Object.entries(userPostCounts).map(([userId, count]) => (
+                <li key={userId}>
+                  User ID {userId}: {count} posts
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No user post data available.</p>
+          )}
+        </div>
       </div>
     </div>
   );

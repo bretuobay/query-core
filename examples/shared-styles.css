@@ -1,0 +1,196 @@
+/* examples/shared-styles.css */
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5; /* Light grey background */
+  color: #333; /* Default text color */
+}
+
+a {
+  color: #0047AB; /* Primary blue for links */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover, a:focus {
+  color: #00FFFF; /* Cyan for hover/focus */
+  text-decoration: underline;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff; /* White background for app content */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for the main container */
+}
+
+nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #e0e0e0; /* Lighter border for nav */
+}
+
+nav a, .nav-link { /* Added .nav-link for components that aren't direct <a> tags but function as nav links */
+  margin-right: 25px;
+  font-weight: bold;
+  font-size: 1.1em;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav a.active, .nav-link.active { /* Assuming 'active' class is used for active links */
+  background-color: #0047AB;
+  color: #ffffff;
+}
+
+nav a:hover, .nav-link:hover {
+  background-color: #e0e0e0; /* Light grey background on hover */
+  color: #002B69; /* Darker blue on hover */
+  text-decoration: none; /* Remove underline for nav links specifically */
+}
+
+
+/* Card Styles */
+.dashboard-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+  gap: 20px; /* Space between cards */
+  justify-content: center; /* Center cards if they don't fill the row */
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 71, 171, 0.15); /* Blueish shadow, more pronounced */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex: 1; /* Allows cards to grow */
+  min-width: 300px; /* Minimum width for cards */
+  max-width: calc(50% - 10px); /* Each card takes up to half the width minus half the gap */
+  /* To ensure two cards are next to each other horizontally, this max-width is key.
+     Adjust if more than 2 cards per row is desired or if parent container has padding. */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Slight lift effect on hover */
+  box-shadow: 0 8px 25px rgba(0, 71, 171, 0.2); /* Enhanced shadow on hover */
+}
+
+.card-title {
+  font-size: 2.5em; /* Large font for title */
+  color: #0047AB; /* Blue title */
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.card-content p {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #555; /* Slightly lighter text for content */
+}
+
+.card-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #0047AB;
+  color: #ffffff;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.card-link:hover {
+  background-color: #002B69; /* Darker blue for card link hover */
+  color: #ffffff; /* Keep text white on hover */
+  text-decoration: none;
+}
+
+/* Specific styling for posts list and post detail if needed */
+.posts-list {
+  list-style: none;
+  padding: 0;
+}
+
+.posts-list li {
+  background-color: #f9f9f9; /* Light background for list items */
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.posts-list li a {
+  font-weight: bold;
+}
+
+.post-detail-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.post-detail-container h1 {
+  color: #0047AB;
+  font-size: 2.8em;
+}
+
+.post-detail-container p {
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column; /* Stack cards vertically on smaller screens */
+    align-items: center; /* Center cards when stacked */
+  }
+
+  .card {
+    max-width: 90%; /* Allow cards to take more width on smaller screens */
+    min-width: none; /* Remove min-width constraint */
+  }
+
+  .card-title {
+    font-size: 2em; /* Slightly smaller title on mobile */
+  }
+
+  .post-detail-container h1 {
+    font-size: 2.2em;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav a, .nav-link {
+    margin-right: 0;
+    margin-bottom: 10px;
+    width: 100%; /* Make nav links take full width */
+    box-sizing: border-box;
+  }
+}

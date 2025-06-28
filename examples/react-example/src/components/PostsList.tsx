@@ -42,29 +42,30 @@ const PostsList: React.FC = () => {
   }, []);
 
   if (postsState.isLoading) {
-    return <div>Loading posts...</div>;
+    return <div className="text-center mt-2">Loading posts...</div>;
   }
 
   if (postsState.isError) {
-    return <div>Error fetching posts: {postsState.error?.message || 'Unknown error'}</div>;
+    return <div className="text-center mt-2 error-message">Error fetching posts: {postsState.error?.message || 'Unknown error'}</div>;
   }
 
   return (
-    <div>
-      <h1>Posts</h1>
+    <div className="posts-list-container">
+      <h1 className="text-center mb-2">Posts</h1>
       {postsState.data && postsState.data.length > 0 ? (
         <ul className="posts-list">
           {postsState.data.map((post) => (
             <li key={post.id}>
               <Link to={`/posts/${post.id}`}>
-                <h2>{post.title}</h2>
+                {post.title}
               </Link>
-              <p>{post.body}</p>
+              {/* Optional: Add a snippet of post.body if desired, or style differently */}
+              {/* <p>{post.body.substring(0, 100)}...</p> */}
             </li>
           ))}
         </ul>
       ) : (
-        <p>No posts found.</p>
+        <p className="text-center mt-2">No posts found.</p>
       )}
     </div>
   );

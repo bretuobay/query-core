@@ -60,28 +60,27 @@ const PostDetail: React.FC = () => {
   }, [id, postDetailEndpointKey]);
 
   if (!id) {
-    return <div>Error: Post ID is missing.</div>;
+    return <div className="text-center mt-2 error-message">Error: Post ID is missing.</div>;
   }
 
   if (postState.isLoading) {
-    return <div>Loading post details for ID: {id}...</div>;
+    return <div className="text-center mt-2">Loading post details for ID: {id}...</div>;
   }
 
   if (postState.isError) {
-    return <div>Error fetching post {id}: {postState.error?.message || 'Unknown error'}</div>;
+    return <div className="text-center mt-2 error-message">Error fetching post {id}: {postState.error?.message || 'Unknown error'}</div>;
   }
 
   if (!postState.data) {
-    return <p>No post details found for ID: {id}.</p>;
+    return <p className="text-center mt-2">No post details found for ID: {id}.</p>;
   }
 
   return (
     <div className="post-detail-container">
       <h1>{postState.data.title}</h1>
       <p>{postState.data.body}</p>
-      <small>User ID: {postState.data.userId}</small>
-      <br />
-      <small>Post ID: {postState.data.id}</small>
+      <small className="post-meta">User ID: {postState.data.userId}</small>
+      <small className="post-meta">Post ID: {postState.data.id}</small>
     </div>
   );
 };

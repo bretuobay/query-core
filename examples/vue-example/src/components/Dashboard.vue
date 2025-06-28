@@ -1,25 +1,28 @@
 <template>
-  <div>
-    <h1>Dashboard</h1>
-    <!-- incase of error errorPosts -->
-    <div v-if="isErrorPosts">
-      <p>Error loading posts: {{ errorPosts?.message || 'Unknown error' }}</p>
+  <div class="dashboard-container">
+    <div v-if="isLoadingPosts" class="text-center mt-2">Loading dashboard data...</div>
+    <div v-else-if="isErrorPosts" class="text-center mt-2 error-message">
+      Error loading dashboard: {{ errorPosts?.message || 'Unknown error' }}
     </div>
-    <div class="dashboard-card">
-      <h2>Total Posts</h2>
-      <p v-if="isLoadingPosts">Loading...</p>
-      <p v-else-if="isErrorPosts">Error loading posts.</p>
-      <p v-else>{{ postsCount }}</p>
-    </div>
-    <div class="dashboard-card">
-      <h2>Posts per User</h2>
-      <p v-if="isLoadingPosts">Loading...</p>
-      <p v-else-if="isErrorPosts">Error loading user data.</p>
-      <ul v-else-if="Object.keys(userPostCounts).length > 0">
-        <li v-for="(count, userId) in userPostCounts" :key="userId">User ID {{ userId }}: {{ count }} posts</li>
-      </ul>
-      <p v-else>No user post data available.</p>
-    </div>
+    <template v-else>
+      <div class="card">
+        <h2 class="card-title">Total Posts</h2>
+        <div class="card-content">
+          <p>{{ postsCount }}</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="card-title">Posts per User</h2>
+        <div class="card-content">
+          <ul v-if="Object.keys(userPostCounts).length > 0">
+            <li v-for="(count, userId) in userPostCounts" :key="userId">
+              User ID {{ userId }}: {{ count }} posts
+            </li>
+          </ul>
+          <p v-else>No user post data available.</p>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -81,13 +84,8 @@ const userPostCounts = computed<UserPostCounts>(() => {
 </script>
 
 <style scoped>
-.dashboard-card {
-  background-color: #f0f0f0;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-}
-.dashboard-card h2 {
-  margin-top: 0;
-}
+/* Scoped styles for Dashboard.vue can be removed if all styling
+   is handled by shared-styles.css or global styles.
+   If there are dashboard-specific styles that don't belong in the shared system,
+   they can remain here. For this task, we assume shared styles cover card layout. */
 </style>
