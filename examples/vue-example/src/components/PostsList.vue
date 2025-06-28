@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { queryCore, fetchPosts, POSTS_ENDPOINT_KEY, Post, EndpointState } from '../queryClient'; // Added Post and EndpointState
+import { queryCore, fetchPosts, POSTS_ENDPOINT_KEY, type Post, type EndpointState } from '../queryClient'; // Added Post and EndpointState
 
 const postsState = ref<EndpointState<Post[]>>({
   data: undefined,
@@ -58,7 +58,6 @@ const isLoading = computed(() => postsState.value.isLoading);
 const isError = computed(() => postsState.value.isError);
 const error = computed(() => postsState.value.error);
 const posts = computed(() => postsState.value.data);
-
 </script>
 
 <style scoped>
