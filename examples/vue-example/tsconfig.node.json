@@ -18,9 +18,11 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "baseUrl": ".", // Add baseUrl
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "allowSyntheticDefaultImports": true // Add this line
   },
   "include": ["vite.config.ts"]
 }
