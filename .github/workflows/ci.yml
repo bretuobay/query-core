@@ -27,8 +27,7 @@ jobs:
         run: npm install
 
       - name: Run tests (Vitest)
-        # run: npm test
-        run: ls
+        run: npm test
 
       - name: Build package
         run: npm run build
