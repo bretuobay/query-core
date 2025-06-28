@@ -12,6 +12,7 @@ export interface Post {
 export const queryCore = new QueryCore({
   // global options if any, e.g.
   // defaultRefetchAfter: 1000 * 60 * 5, // 5 minutes
+  cacheProvider: 'indexedDB',
 });
 
 // Endpoint keys
