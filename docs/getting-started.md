@@ -9,7 +9,8 @@ npm install query-core
 # or
 yarn add query-core
 ```
-*(Assuming package name will be 'query-core')*
+
+_(Assuming package name will be 'query-core')_
 
 ## Basic Usage
 

@@ -2,31 +2,32 @@
 
 This section will provide practical examples of how to integrate and use `QueryCore` in various scenarios.
 
-*(Content to be added)*
+_(Content to be added)_
 
 ## 1. Vanilla TypeScript Project
 
-*(Example code and explanation)*
+_(Example code and explanation)_
 
 ## 2. React Integration
 
-*(Example using a custom hook or context)*
+_(Example using a custom hook or context)_
 
 ## 3. Vue Integration
 
-*(Example using a composable or plugin)*
+_(Example using a composable or plugin)_
 
 ## 4. Svelte Integration
 
-*(Example with Svelte stores)*
+_(Example with Svelte stores)_
 
 ## 5. Handling Pagination
 
-*(Recipe for paginated data)*
+_(Recipe for paginated data)_
 
 ## 6. Optimistic Updates (Pattern)
 
-*(How to implement an optimistic update pattern with QueryCore)*
+_(How to implement an optimistic update pattern with QueryCore)_
 
 ---
+
 Return to [Getting Started](./getting-started.md) or the [API Reference](./api-reference.md).

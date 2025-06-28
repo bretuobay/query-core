@@ -31,9 +31,9 @@ class MockIDBRequest {
     const event = new Event(type);
     Object.defineProperty(event, 'target', { value: this, writable: false });
     if (type === 'success' && this.onsuccess) {
-        setTimeout(() => this.onsuccess!(event), operationDelay);
+      setTimeout(() => this.onsuccess!(event), operationDelay);
     } else if (type === 'error' && this.onerror) {
-        setTimeout(() => this.onerror!(event), operationDelay);
+      setTimeout(() => this.onerror!(event), operationDelay);
     }
   }
 }
@@ -53,7 +53,8 @@ class MockIDBObjectStore {
     return request as unknown as IDBRequest;
   }
 
-  put(value: any, key?: any): IDBRequest { // key is part of value for QueryCore
+  put(value: any, key?: any): IDBRequest {
+    // key is part of value for QueryCore
     const request = new MockIDBRequest();
     const itemKey = value.key || key;
     if (dbShouldFail) {
@@ -99,7 +100,11 @@ class MockIDBTransaction {
   public onabort: ((event: Event) => void) | null = null;
   private eventTarget: EventTarget;
 
-  constructor(private storeNames: string | string[], public mode: IDBTransactionMode, private db: MockIDBDatabase) {
+  constructor(
+    private storeNames: string | string[],
+    public mode: IDBTransactionMode,
+    private db: MockIDBDatabase,
+  ) {
     this.eventTarget = new EventTarget();
   }
 
@@ -108,21 +113,23 @@ class MockIDBTransaction {
       throw new DOMException('Store not in transaction scope', 'NotFoundError');
     }
     if (name !== MOCK_STORE_NAME) {
-        throw new DOMException(`Mock store "${name}" not found`, 'NotFoundError');
+      throw new DOMException(`Mock store "${name}" not found`, 'NotFoundError');
     }
-    return new MockIDBObjectStore(name/*, this*/) as unknown as IDBObjectStore;
+    return new MockIDBObjectStore(name /*, this*/) as unknown as IDBObjectStore;
   }
 
   // These are typically called by the browser after requests complete.
   // For simplicity, we might not need to fully simulate this unless tests depend on it.
-  _commit() { if (this.oncomplete) setTimeout(() => this.oncomplete(new Event('complete')), operationDelay + 10); }
+  _commit() {
+    if (this.oncomplete) setTimeout(() => this.oncomplete(new Event('complete')), operationDelay + 10);
+  }
   _abort(error?: DOMException) {
     if (this.onerror && error) {
-        const event = new Event('error') as any;
-        event.target = { error };
-        setTimeout(() => this.onerror!(event), operationDelay + 10);
+      const event = new Event('error') as any;
+      event.target = { error };
+      setTimeout(() => this.onerror!(event), operationDelay + 10);
     } else if (this.onabort) {
-        setTimeout(() => this.onabort!(new Event('abort')), operationDelay + 10);
+      setTimeout(() => this.onabort!(new Event('abort')), operationDelay + 10);
     }
   }
 }
@@ -135,13 +142,17 @@ class MockIDBDatabase {
   } as DOMStringList;
   public onversionchange: ((event: IDBVersionChangeEvent) => void) | null = null;
 
-  constructor(public name: string, public version: number) {}
+  constructor(
+    public name: string,
+    public version: number,
+  ) {}
 
   transaction(storeNames: string | string[], mode?: IDBTransactionMode): IDBTransaction {
-    if (dbShouldFail && mode ==='readwrite') { // Make transactions fail if dbShouldFail
-        const tx = new MockIDBTransaction(storeNames, mode || 'readonly', this);
-        setTimeout(() => tx._abort(new DOMException('Mocked transaction error', 'AbortError')), 0);
-        return tx as unknown as IDBTransaction;
+    if (dbShouldFail && mode === 'readwrite') {
+      // Make transactions fail if dbShouldFail
+      const tx = new MockIDBTransaction(storeNames, mode || 'readonly', this);
+      setTimeout(() => tx._abort(new DOMException('Mocked transaction error', 'AbortError')), 0);
+      return tx as unknown as IDBTransaction;
     }
     const tx = new MockIDBTransaction(storeNames, mode || 'readonly', this);
     // Auto-commit for simplicity in mock, real IDB waits for requests.
@@ -157,7 +168,9 @@ class MockIDBDatabase {
     return new MockIDBObjectStore(name) as unknown as IDBObjectStore;
   }
 
-  close() { /* no-op for mock */ }
+  close() {
+    /* no-op for mock */
+  }
 }
 
 class MockIDBOpenDBRequest extends MockIDBRequest {
@@ -189,7 +202,7 @@ class MockIDBOpenDBRequest extends MockIDBRequest {
         this.onupgradeneeded!(event);
         // After onupgradeneeded, onsuccess should fire for the open request
         if (this.onsuccess) {
-            super._dispatch('success');
+          super._dispatch('success');
         }
       }, operationDelay);
     } else if (this.onsuccess) {
@@ -197,7 +210,6 @@ class MockIDBOpenDBRequest extends MockIDBRequest {
     }
   }
 }
-
 
 export function setupMockIndexedDB() {
   if (!originalIndexedDB) {
@@ -244,7 +256,7 @@ export function setupMockIndexedDB() {
 
 export function resetMockIndexedDB() {
   if (originalIndexedDB) {
-     Object.defineProperty(window, 'indexedDB', {
+    Object.defineProperty(window, 'indexedDB', {
       value: originalIndexedDB,
       writable: true, // Assuming original might have specific descriptor
       configurable: true,
@@ -261,7 +273,7 @@ export function getMockIndexedDBStore(): Readonly<MockIDBStore> {
 }
 
 export function setMockIndexedDBStore(store: MockIDBStore) {
-    mockDBStore = {...store};
+  mockDBStore = { ...store };
 }
 
 export function setMockIndexedDBShouldFail(shouldFail: boolean) {

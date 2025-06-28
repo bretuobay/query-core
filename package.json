@@ -38,7 +38,8 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint . --ext .ts,.js",
-    "lint:fix": "eslint . --ext .ts,.js --fix"
+    "lint:fix": "eslint . --ext .ts,.js --fix",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/node": "^20.x.x",
