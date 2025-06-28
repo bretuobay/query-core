@@ -1,17 +1,18 @@
 import { CacheProvider } from './cacheProviders/CacheProvider';
 import { LocalStorageCacheProvider } from './cacheProviders/LocalStorageCacheProvider';
 import { IndexedDBCacheProvider } from './cacheProviders/IndexedDBCacheProvider';
+import { InMemoryCacheProvider } from './cacheProviders/InMemoryCacheProvider'; // Added import
 
 // --- Core Library Interface ---
 
 export interface QueryCoreOptions {
-  cacheProvider?: 'localStorage' | 'indexedDB' | CacheProvider; // Allow custom provider instance
+  cacheProvider?: 'localStorage' | 'indexedDB' | 'inMemory' | CacheProvider; // Allow custom provider instance
   defaultRefetchAfter?: number; // Global default for refetchAfter
 }
 
 export interface EndpointOptions {
   refetchAfter?: number; // in milliseconds
-  cacheProvider?: 'localStorage' | 'indexedDB' | CacheProvider; // Override global cache provider
+  cacheProvider?: 'localStorage' | 'indexedDB' | 'inMemory' | CacheProvider; // Override global cache provider
 }
 
 export interface EndpointState<TData> {
@@ -37,7 +38,7 @@ class QueryCore {
 
   constructor(options?: QueryCoreOptions) {
     this.globalOptions = {
-      cacheProvider: 'localStorage', // Default cache provider type
+      cacheProvider: 'inMemory', // Default cache provider type
       defaultRefetchAfter: undefined, // No global refetchAfter by default
       ...options,
     };
@@ -90,14 +91,20 @@ class QueryCore {
     });
   }
 
-  private _getCacheProvider(providerOption: 'localStorage' | 'indexedDB' | CacheProvider | undefined): CacheProvider {
+  private _getCacheProvider(
+    providerOption: 'localStorage' | 'indexedDB' | 'inMemory' | CacheProvider | undefined,
+  ): CacheProvider {
     if (typeof providerOption === 'object') {
       return providerOption; // User provided a custom cache provider instance
     }
     if (providerOption === 'indexedDB') {
       return new IndexedDBCacheProvider();
     }
-    return new LocalStorageCacheProvider(); // Default or 'localStorage'
+    if (providerOption === 'localStorage') {
+      return new LocalStorageCacheProvider();
+    }
+    // Default to InMemoryCacheProvider if 'inMemory' or undefined (or any other string not matched)
+    return new InMemoryCacheProvider();
   }
 
   /**

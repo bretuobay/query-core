@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import QueryCore, { QueryCoreOptions } from './QueryCore';
 import { LocalStorageCacheProvider } from './cacheProviders/LocalStorageCacheProvider';
 import { IndexedDBCacheProvider } from './cacheProviders/IndexedDBCacheProvider';
+import { InMemoryCacheProvider } from './cacheProviders/InMemoryCacheProvider'; // Added import
 import { MockSimpleCacheProvider } from './mocks/MockSimpleCacheProvider';
 import { mockFetch, resetFetch } from './mocks/mockFetch'; // Assuming mockFetch is still useful for some fetcher tests
 
@@ -24,7 +25,7 @@ describe('QueryCore', () => {
     it('should initialize with default global options if none provided', () => {
       qc = new QueryCore();
       // @ts-expect-error private property, but we can check it
-      expect(qc.globalOptions.cacheProvider).toBe('localStorage');
+      expect(qc.globalOptions.cacheProvider).toBe('inMemory');
       // @ts-expect-error private property, but we can check it
       expect(qc.globalOptions.defaultRefetchAfter).toBeUndefined();
     });
@@ -75,7 +76,7 @@ describe('QueryCore', () => {
       expect(endpoint).toBeDefined();
       expect(endpoint?.fetcher).toBe(mockFetcher);
       expect(endpoint?.options.refetchAfter).toBeUndefined(); // Global default
-      expect(endpoint?.cache).toBeInstanceOf(LocalStorageCacheProvider); // Global default
+      expect(endpoint?.cache).toBeInstanceOf(InMemoryCacheProvider); // Global default
       expect(endpoint?.state.isLoading).toBe(false);
     });
 

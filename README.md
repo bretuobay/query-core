@@ -5,7 +5,7 @@ QueryCore is a lightweight, zero-dependency library for managing asynchronous da
 ## Features
 
 - **Declarative API:** Define data endpoints with associated fetcher functions and options.
-- **Automatic Caching:** Built-in support for `localStorage` and `indexedDB` caching, or provide your own custom cache provider.
+- **Automatic Caching:** Built-in support for `inMemory`, `localStorage`, and `indexedDB` caching, or provide your own custom cache provider. Default is `inMemory`.
 - **State Management:** Endpoints maintain their own state (data, loading, error, last updated).
 - **Subscription Model:** Components can subscribe to endpoint state changes and reactively update.
 - **Automatic Refetching:**
@@ -49,11 +49,11 @@ Options to configure the `QueryCore` instance globally.
 
 ```typescript
 export interface QueryCoreOptions {
-  cacheProvider?: 'localStorage' | 'indexedDB' | CacheProvider; // Default: 'localStorage'
+  cacheProvider?: 'inMemory' | 'localStorage' | 'indexedDB' | CacheProvider; // Default: 'inMemory'
   defaultRefetchAfter?: number; // Global default for refetchAfter (in milliseconds)
 }
 ```
-- `cacheProvider`: Specifies the default caching mechanism. Can be a string (`'localStorage'`, `'indexedDB'`) or a custom object implementing the `CacheProvider` interface.
+- `cacheProvider`: Specifies the default caching mechanism. Can be a string (`'inMemory'`, `'localStorage'`, `'indexedDB'`) or a custom object implementing the `CacheProvider` interface.
 - `defaultRefetchAfter`: A global default (in milliseconds) indicating how long data is considered fresh before a refetch is attempted upon subscription or window focus.
 
 #### `EndpointOptions`
@@ -63,11 +63,11 @@ Options to configure a specific endpoint, overriding global settings if provided
 ```typescript
 export interface EndpointOptions {
   refetchAfter?: number; // in milliseconds
-  cacheProvider?: 'localStorage' | 'indexedDB' | CacheProvider; // Override global cache provider
+  cacheProvider?: 'inMemory' | 'localStorage' | 'indexedDB' | CacheProvider; // Override global cache provider
 }
 ```
 - `refetchAfter`: Endpoint-specific duration (in milliseconds) after which data is considered stale.
-- `cacheProvider`: Endpoint-specific cache provider.
+- `cacheProvider`: Endpoint-specific cache provider (can be `'inMemory'`, `'localStorage'`, `'indexedDB'`, or a custom provider).
 
 #### `EndpointState<TData>`
 
@@ -233,9 +233,12 @@ const unsubscribe = queryClient.subscribe('userDetails/1', (state) => {
 
 ## Cache Providers
 
-QueryCore supports two built-in cache providers:
-- `LocalStorageCacheProvider`: Uses browser `localStorage`. Data is stored as JSON strings.
-- `IndexedDBCacheProvider`: Uses browser `IndexedDB`. Offers more robust client-side storage.
+QueryCore supports three built-in cache providers:
+- `InMemoryCacheProvider`: (Default) Uses an in-memory JavaScript `Map`. Data is lost when the page is refreshed or closed. Ideal for short-lived data or testing.
+- `LocalStorageCacheProvider`: Uses browser `localStorage`. Data is stored as JSON strings and persists across sessions.
+- `IndexedDBCacheProvider`: Uses browser `IndexedDB`. Offers more robust client-side storage and persists across sessions.
+
+You can specify the cache provider globally when creating the `QueryCore` instance, or per-endpoint.
 
 You can also implement your own custom cache provider by adhering to the `CacheProvider` interface:
 
@@ -246,12 +249,13 @@ export interface CacheItem<TData> {
 }
 
 export interface CacheProvider {
-  get<TData>(key: string): Promise<CacheItem<TData> | undefined>;
-  set<TData>(key: string, value: CacheItem<TData>): Promise<void>;
+  get<TData>(key: string): Promise<CachedItem<TData> | undefined>;
+  set<TData>(key: string, item: CachedItem<TData>): Promise<void>;
   remove(key: string): Promise<void>;
-  clear(): Promise<void>; // Optional: for clearing all items managed by this provider
+  clearAll?(): Promise<void>; // Optional: for clearing all items managed by this provider
 }
 ```
+(Note: The interface name in the documentation was `CacheItem`, but in the code it's `CachedItem`. The `clear` method is `clearAll` in the code.)
 
 Then, pass an instance of your custom provider:
 
