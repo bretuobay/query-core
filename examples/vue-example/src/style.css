@@ -107,14 +107,21 @@ button:focus-visible {
    The .app-container in shared-styles.css already handles full width.
 */
 #app {
-  /* max-width: 1280px; */ /* Remove to allow .app-container to control width */
-  margin: 0 auto; /* This is fine, .app-container also has it */
-  /* padding: 2rem; */ /* Padding is handled by .app-container */
-  /* text-align: center; */ /* Specific components should handle text alignment */
-  width: 100%; /* Ensure #app itself also tries to be full width */
-  min-height: 100vh; /* Ensure #app can fill height */
+  /* max-width: 1280px; */
+  /* Remove to allow .app-container to control width */
+  margin: 0 auto;
+  /* This is fine, .app-container also has it */
+  /* padding: 2rem; */
+  /* Padding is handled by .app-container */
+  /* text-align: center; */
+  /* Specific components should handle text alignment */
+  width: 100%;
+  /* Ensure #app itself also tries to be full width */
+  height: 100vh;
+  /* Ensure #app can fill height */
   display: flex;
   flex-direction: column;
+
 }
 
 
