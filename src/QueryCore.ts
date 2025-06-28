@@ -70,7 +70,8 @@ class QueryCore {
     if (document.visibilityState === 'visible') {
       console.log('QueryCore: Window focused. Refetching observed stale queries.');
       this.endpoints.forEach((endpoint, key) => {
-        if (endpoint.subscribers.size > 0) { // Only refetch if observed
+        if (endpoint.subscribers.size > 0) {
+          // Only refetch if observed
           // forceRefetch = false to respect refetchAfter
           this.refetch(key, false);
         }
@@ -81,7 +82,8 @@ class QueryCore {
   private _handleOnlineStatus(): void {
     console.log('QueryCore: Network connection restored. Refetching observed stale queries.');
     this.endpoints.forEach((endpoint, key) => {
-      if (endpoint.subscribers.size > 0) { // Only refetch if observed
+      if (endpoint.subscribers.size > 0) {
+        // Only refetch if observed
         // forceRefetch = true because network was just restored, data might be stale regardless of timer
         this.refetch(key, true);
       }
@@ -105,10 +107,12 @@ class QueryCore {
   public async defineEndpoint<TData>(
     endpointKey: string,
     fetcher: () => Promise<TData>,
-    options: EndpointOptions = {} // Default to empty object
+    options: EndpointOptions = {}, // Default to empty object
   ): Promise<void> {
     if (this.endpoints.has(endpointKey)) {
-      console.warn(`QueryCore: Endpoint with key "${endpointKey}" is already defined. Overwriting existing definition.`);
+      console.warn(
+        `QueryCore: Endpoint with key "${endpointKey}" is already defined. Overwriting existing definition.`,
+      );
     }
 
     const effectiveOptions: EndpointOptions = {
@@ -136,7 +140,10 @@ class QueryCore {
       subscribers: new Set(),
       cache: cache,
     });
-    console.log(`QueryCore: Endpoint "${endpointKey}" defined. Initial state loaded from cache (if available). Options:`, effectiveOptions);
+    console.log(
+      `QueryCore: Endpoint "${endpointKey}" defined. Initial state loaded from cache (if available). Options:`,
+      effectiveOptions,
+    );
 
     // Trigger an immediate state notification for subscribers who might have been added
     // before defineEndpoint completed (if that scenario is possible, though unlikely with current API).
@@ -159,10 +166,13 @@ class QueryCore {
           stateForSubscriber.data = structuredClone(stateForSubscriber.data);
         } catch (e) {
           // Fallback or specific handling if structuredClone fails (e.g. for non-cloneable types)
-          console.warn(`QueryCore: Could not structured-clone data for endpoint ${endpointKey}. Subscribers will get a shallow copy of data.`, e);
+          console.warn(
+            `QueryCore: Could not structured-clone data for endpoint ${endpointKey}. Subscribers will get a shallow copy of data.`,
+            e,
+          );
         }
       }
-      endpoint.subscribers.forEach(callback => callback(stateForSubscriber));
+      endpoint.subscribers.forEach((callback) => callback(stateForSubscriber));
     }
   }
 
@@ -170,16 +180,20 @@ class QueryCore {
    * Subscribes to an endpoint's state changes.
    * The callback is immediately invoked with the current state.
    */
-  public subscribe<TData>(
-    endpointKey: string,
-    callback: (state: EndpointState<TData>) => void
-  ): () => void { // Returns an unsubscribe function
+  public subscribe<TData>(endpointKey: string, callback: (state: EndpointState<TData>) => void): () => void {
+    // Returns an unsubscribe function
     const endpoint = this.endpoints.get(endpointKey) as Endpoint<TData> | undefined;
 
     if (!endpoint) {
-      console.error(`QueryCore: Cannot subscribe. Endpoint "${endpointKey}" not defined. Define it first using defineEndpoint.`);
+      console.error(
+        `QueryCore: Cannot subscribe. Endpoint "${endpointKey}" not defined. Define it first using defineEndpoint.`,
+      );
       callback({
-        data: undefined, isLoading: false, isError: true, error: new Error(`Endpoint "${endpointKey}" not defined.`), lastUpdated: undefined
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        error: new Error(`Endpoint "${endpointKey}" not defined.`),
+        lastUpdated: undefined,
       });
       return () => {}; // Return a no-op unsubscribe function
     }
@@ -194,19 +208,21 @@ class QueryCore {
     const { refetchAfter } = endpoint.options;
     const { lastUpdated, isLoading } = endpoint.state;
 
-    if (!isLoading) { // Only consider refetch if not already loading
-        if (refetchAfter && lastUpdated) {
-            const timeSinceLastFetch = Date.now() - lastUpdated;
-            if (timeSinceLastFetch >= refetchAfter) {
-                console.log(`QueryCore: Data for "${endpointKey}" is stale upon subscription. Triggering refetch.`);
-                this.refetch(endpointKey, false); // Do not force, respect refetchAfter interval precisely
-            }
-        } else if (!lastUpdated && endpoint.fetcher) {
-            // Data has never been fetched for this endpoint by this instance, and it's being observed.
-            // This handles the case where an endpoint is defined, cache is empty/miss, and then subscribed to.
-            console.log(`QueryCore: Data for "${endpointKey}" not present upon subscription. Triggering initial fetch.`);
-            this.refetch(endpointKey, true); // Force fetch as there's no data.
+    if (!isLoading) {
+      // Only consider refetch if not already loading
+      if (refetchAfter && lastUpdated) {
+        const timeSinceLastFetch = Date.now() - lastUpdated;
+        if (timeSinceLastFetch >= refetchAfter) {
+          console.log(`QueryCore: Data for "${endpointKey}" is stale upon subscription. Triggering refetch.`);
+          this.refetch(endpointKey, false); // Do not force, respect refetchAfter interval precisely
         }
+        // function is always defined. Did you mean to call it instead? } else if (!lastUpdated && endpoint.fetcher) {
+      } else if (!lastUpdated) {
+        // Data has never been fetched for this endpoint by this instance, and it's being observed.
+        // This handles the case where an endpoint is defined, cache is empty/miss, and then subscribed to.
+        console.log(`QueryCore: Data for "${endpointKey}" not present upon subscription. Triggering initial fetch.`);
+        this.refetch(endpointKey, true); // Force fetch as there's no data.
+      }
     }
 
     return () => {
@@ -238,7 +254,9 @@ class QueryCore {
     if (!forceRefetch && refetchAfter && lastUpdated) {
       const timeSinceLastFetch = Date.now() - lastUpdated;
       if (timeSinceLastFetch < refetchAfter) {
-        console.log(`QueryCore: Refetch for "${endpointKey}" skipped, data is still fresh (fetched ${timeSinceLastFetch / 1000}s ago, refetchAfter ${refetchAfter / 1000}s).`);
+        console.log(
+          `QueryCore: Refetch for "${endpointKey}" skipped, data is still fresh (fetched ${timeSinceLastFetch / 1000}s ago, refetchAfter ${refetchAfter / 1000}s).`,
+        );
         // Ensure subscribers are notified of current (fresh) data if they weren't already
         this._updateStateAndNotify(endpointKey, {}); // Notify with current state
         return Promise.resolve();
@@ -285,7 +303,12 @@ class QueryCore {
     }
     await endpoint.cache.remove(endpointKey); // Await cache removal
     // Also clear the data from the in-memory state and reset relevant fields.
-    this._updateStateAndNotify(endpointKey, { data: undefined, lastUpdated: undefined, error: undefined, isError: false });
+    this._updateStateAndNotify(endpointKey, {
+      data: undefined,
+      lastUpdated: undefined,
+      error: undefined,
+      isError: false,
+    });
     console.log(`QueryCore: Cache invalidated for "${endpointKey}". Data cleared from cache and current state.`);
   }
 
@@ -301,13 +324,18 @@ class QueryCore {
         try {
           stateCopy.data = structuredClone(stateCopy.data);
         } catch (e) {
-          console.warn(`QueryCore: Could not structured-clone data for endpoint ${endpointKey} in getState. Returning shallow copy of data.`, e);
+          console.warn(
+            `QueryCore: Could not structured-clone data for endpoint ${endpointKey} in getState. Returning shallow copy of data.`,
+            e,
+          );
         }
       }
       return stateCopy;
     }
     // Return a default "not found" or "initial" state if endpoint doesn't exist
-    console.warn(`QueryCore: getState called for undefined endpoint "${endpointKey}". Returning default initial state.`);
+    console.warn(
+      `QueryCore: getState called for undefined endpoint "${endpointKey}". Returning default initial state.`,
+    );
     return {
       data: undefined,
       isLoading: false,

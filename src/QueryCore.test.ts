@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import QueryCore, { QueryCoreOptions, EndpointOptions, EndpointState } from './QueryCore';
+import QueryCore, { QueryCoreOptions } from './QueryCore';
 import { LocalStorageCacheProvider } from './cacheProviders/LocalStorageCacheProvider';
 import { IndexedDBCacheProvider } from './cacheProviders/IndexedDBCacheProvider';
 import { MockSimpleCacheProvider } from './mocks/MockSimpleCacheProvider';
@@ -23,9 +23,9 @@ describe('QueryCore', () => {
   describe('Constructor & Setup', () => {
     it('should initialize with default global options if none provided', () => {
       qc = new QueryCore();
-      // @ts-ignore - accessing private member for test verification
+      // @ts-expect-error private property, but we can check it
       expect(qc.globalOptions.cacheProvider).toBe('localStorage');
-      // @ts-ignore
+      // @ts-expect-error private property, but we can check it
       expect(qc.globalOptions.defaultRefetchAfter).toBeUndefined();
     });
 
@@ -35,9 +35,9 @@ describe('QueryCore', () => {
         defaultRefetchAfter: 10000,
       };
       qc = new QueryCore(options);
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       expect(qc.globalOptions.cacheProvider).toBe('indexedDB');
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       expect(qc.globalOptions.defaultRefetchAfter).toBe(10000);
     });
 
@@ -47,7 +47,7 @@ describe('QueryCore', () => {
         cacheProvider: customCache,
       };
       qc = new QueryCore(options);
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       expect(qc.globalOptions.cacheProvider).toBe(customCache);
     });
 
@@ -70,29 +70,29 @@ describe('QueryCore', () => {
 
     it('should define an endpoint with a fetcher and default options', async () => {
       await qc.defineEndpoint('testEp', mockFetcher);
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
       expect(endpoint).toBeDefined();
-      expect(endpoint.fetcher).toBe(mockFetcher);
-      expect(endpoint.options.refetchAfter).toBeUndefined(); // Global default
-      expect(endpoint.cache).toBeInstanceOf(LocalStorageCacheProvider); // Global default
-      expect(endpoint.state.isLoading).toBe(false);
+      expect(endpoint?.fetcher).toBe(mockFetcher);
+      expect(endpoint?.options.refetchAfter).toBeUndefined(); // Global default
+      expect(endpoint?.cache).toBeInstanceOf(LocalStorageCacheProvider); // Global default
+      expect(endpoint?.state.isLoading).toBe(false);
     });
 
     it('should use global defaultRefetchAfter if not specified at endpoint level', async () => {
       qc = new QueryCore({ defaultRefetchAfter: 5000 });
       await qc.defineEndpoint('testEp', mockFetcher);
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
-      expect(endpoint.options.refetchAfter).toBe(5000);
+      expect(endpoint?.options.refetchAfter).toBe(5000);
     });
 
     it('should override global defaultRefetchAfter with endpoint-specific option', async () => {
       qc = new QueryCore({ defaultRefetchAfter: 5000 });
       await qc.defineEndpoint('testEp', mockFetcher, { refetchAfter: 1000 });
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
-      expect(endpoint.options.refetchAfter).toBe(1000);
+      expect(endpoint?.options.refetchAfter).toBe(1000);
     });
 
     it('should use global cacheProvider if not specified at endpoint level', async () => {
@@ -102,9 +102,9 @@ describe('QueryCore', () => {
       const simpleCache = new MockSimpleCacheProvider();
       qc = new QueryCore({ cacheProvider: simpleCache });
       await qc.defineEndpoint('testEp', mockFetcher);
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
-      expect(endpoint.cache).toBe(simpleCache);
+      expect(endpoint?.cache).toBe(simpleCache);
     });
 
     it('should override global cacheProvider with endpoint-specific option (string)', async () => {
@@ -113,9 +113,9 @@ describe('QueryCore', () => {
       // For a unit test, we might want to spy/mock its constructor or use MockSimpleCacheProvider.
       // Let's assume the internal _getCacheProvider works for now.
       await qc.defineEndpoint('testEp', mockFetcher, { cacheProvider: 'indexedDB' });
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
-      expect(endpoint.cache).toBeInstanceOf(IndexedDBCacheProvider);
+      expect(endpoint?.cache).toBeInstanceOf(IndexedDBCacheProvider);
     });
 
     it('should override global cacheProvider with endpoint-specific option (instance)', async () => {
@@ -123,10 +123,10 @@ describe('QueryCore', () => {
       const endpointCache = new MockSimpleCacheProvider();
       qc = new QueryCore({ cacheProvider: globalCache });
       await qc.defineEndpoint('testEp', mockFetcher, { cacheProvider: endpointCache });
-      // @ts-ignore
+      // @ts-expect-error private property or method access
       const endpoint = qc.endpoints.get('testEp');
-      expect(endpoint.cache).toBe(endpointCache);
-      expect(endpoint.cache).not.toBe(globalCache);
+      expect(endpoint?.cache).toBe(endpointCache);
+      expect(endpoint?.cache).not.toBe(globalCache);
     });
 
     it('should load initial data from cache if available during defineEndpoint', async () => {
@@ -158,11 +158,13 @@ describe('QueryCore', () => {
       qc.subscribe('testEp', subscriber);
 
       expect(subscriber).toHaveBeenCalledTimes(1); // Immediate call with current state
-      expect(subscriber).toHaveBeenCalledWith(expect.objectContaining({
-        data: initialData,
-        lastUpdated: lastUpdated,
-        isLoading: false,
-      }));
+      expect(subscriber).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: initialData,
+          lastUpdated: lastUpdated,
+          isLoading: false,
+        }),
+      );
     });
   });
 
@@ -242,7 +244,7 @@ describe('QueryCore', () => {
     it('should be ignored if a fetch is already in progress', async () => {
       const data = { message: 'first fetch' };
       mockFetcher.mockImplementationOnce(async () => {
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 100));
         return data;
       });
 
@@ -318,6 +320,7 @@ describe('QueryCore', () => {
       it('should refetch if data is present but lastUpdated is undefined (treat as stale), and forceRefetch is false', async () => {
         const initialData = { message: 'data with no lastUpdated' };
         const newData = { message: 'fetched due to no lastUpdated' };
+        // @ts-expect-error lastUpdated is intentionally undefined
         await cache.set(endpointKey, { data: initialData, lastUpdated: undefined });
         await qc.defineEndpoint(endpointKey, mockFetcher, { refetchAfter: 5000 });
 
@@ -327,7 +330,7 @@ describe('QueryCore', () => {
         expect(mockFetcher).toHaveBeenCalledTimes(1);
         expect(qc.getState(endpointKey).data).toEqual(newData);
       });
-       it('should refetch if no data and no lastUpdated, and forceRefetch is false', async () => {
+      it('should refetch if no data and no lastUpdated, and forceRefetch is false', async () => {
         const newData = { message: 'fetched due to no data' };
         await qc.defineEndpoint(endpointKey, mockFetcher, { refetchAfter: 5000 });
 
@@ -368,7 +371,7 @@ describe('QueryCore', () => {
       mockFetcher.mockResolvedValueOnce(data);
       await qc.refetch(endpointKey);
 
-      const state1 = qc.getState<{ message: string, nested: { value: number }}> (endpointKey);
+      const state1 = qc.getState<{ message: string; nested: { value: number } }>(endpointKey);
       expect(state1.data).toEqual(data);
 
       if (state1.data) {
@@ -377,7 +380,9 @@ describe('QueryCore', () => {
       }
 
       const state2 = qc.getState(endpointKey);
+      // @ts-expect-error data is typed, but we can check its structure
       expect(state2.data?.message).toBe('original data');
+      // @ts-expect-error data is typed, but we can check its structure
       expect(state2.data?.nested?.value).toBe(1);
     });
 
@@ -404,7 +409,12 @@ describe('QueryCore', () => {
 
     it('should call subscriber immediately with initial state, then with loading state for auto-fetch', async () => {
       let resolveAutoFetch: (value: any) => void = () => {};
-      mockFetcher.mockImplementationOnce(() => new Promise(res => { resolveAutoFetch = res; }));
+      mockFetcher.mockImplementationOnce(
+        () =>
+          new Promise((res) => {
+            resolveAutoFetch = res;
+          }),
+      );
 
       await qc.defineEndpoint(endpointKey, mockFetcher);
 
@@ -413,20 +423,26 @@ describe('QueryCore', () => {
 
       expect(subscriber).toHaveBeenCalledTimes(2);
 
-      expect(subscriber).toHaveBeenNthCalledWith(1, expect.objectContaining({
-        data: undefined,
-        isLoading: false,
-        isError: false,
-      }));
+      expect(subscriber).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          data: undefined,
+          isLoading: false,
+          isError: false,
+        }),
+      );
 
-      expect(subscriber).toHaveBeenNthCalledWith(2, expect.objectContaining({
-        data: undefined,
-        isLoading: true,
-        isError: false,
-      }));
+      expect(subscriber).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          data: undefined,
+          isLoading: true,
+          isError: false,
+        }),
+      );
 
-      resolveAutoFetch({message: 'cleanup auto-fetch'});
-      mockFetcher.mockImplementation(async () => ({message: 'default post-cleanup resolution'}));
+      resolveAutoFetch({ message: 'cleanup auto-fetch' });
+      mockFetcher.mockImplementation(async () => ({ message: 'default post-cleanup resolution' }));
       await vi.runAllTimersAsync();
       await new Promise(process.nextTick);
     });
@@ -441,11 +457,13 @@ describe('QueryCore', () => {
       qc.subscribe(endpointKey, subscriber);
 
       expect(subscriber).toHaveBeenCalledTimes(1);
-      expect(subscriber).toHaveBeenCalledWith(expect.objectContaining({
-        data: cachedData,
-        lastUpdated: lastUpdated,
-        isLoading: false,
-      }));
+      expect(subscriber).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: cachedData,
+          lastUpdated: lastUpdated,
+          isLoading: false,
+        }),
+      );
     });
 
     it('should notify subscriber of state changes during a successful refetch', async () => {
@@ -469,11 +487,13 @@ describe('QueryCore', () => {
 
       await refetchPromise;
 
-      expect(subscriber).toHaveBeenCalledWith(expect.objectContaining({
-        isLoading: false,
-        data: manualFetchData,
-        isError: false,
-      }));
+      expect(subscriber).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isLoading: false,
+          data: manualFetchData,
+          isError: false,
+        }),
+      );
       expect(subscriber).toHaveBeenCalledTimes(2);
     });
 
@@ -496,11 +516,13 @@ describe('QueryCore', () => {
 
       await refetchPromise;
 
-      expect(subscriber).toHaveBeenCalledWith(expect.objectContaining({
-        isLoading: false,
-        isError: true,
-        error: error,
-      }));
+      expect(subscriber).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isLoading: false,
+          isError: true,
+          error: error,
+        }),
+      );
       expect(subscriber).toHaveBeenCalledTimes(2);
     });
 
@@ -536,16 +558,18 @@ describe('QueryCore', () => {
       // 2. isLoading: true (from auto-refetch start)
       // 3. data + isLoading: false (from auto-refetch end)
       expect(subscriber).toHaveBeenCalledTimes(2); // Before fetch completes, isLoading:false then isLoading:true
-      expect(subscriber).toHaveBeenNthCalledWith(1,expect.objectContaining({isLoading: false, data: undefined}));
-      expect(subscriber).toHaveBeenNthCalledWith(2,expect.objectContaining({isLoading: true, data: undefined}));
+      expect(subscriber).toHaveBeenNthCalledWith(1, expect.objectContaining({ isLoading: false, data: undefined }));
+      expect(subscriber).toHaveBeenNthCalledWith(2, expect.objectContaining({ isLoading: true, data: undefined }));
 
       await vi.runAllTimersAsync();
       await new Promise(process.nextTick);
 
-      expect(subscriber).toHaveBeenLastCalledWith(expect.objectContaining({
-        isLoading: false,
-        data: fetchedResult,
-      }));
+      expect(subscriber).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          isLoading: false,
+          data: fetchedResult,
+        }),
+      );
       expect(mockFetcher).toHaveBeenCalledTimes(1);
       expect(subscriber).toHaveBeenCalledTimes(3); // Total calls
     });
@@ -557,6 +581,7 @@ describe('QueryCore', () => {
       const initialTime = Date.now();
       vi.setSystemTime(initialTime - 5000);
       const fiveSecAgo = vi.getMockedSystemTime();
+      // @ts-expect-error lastUpdated is intentionally set to simulate staleness
       await cache.setInternalCache(endpointKey, { data: staleData, lastUpdated: fiveSecAgo });
 
       vi.setSystemTime(initialTime);
@@ -583,7 +608,7 @@ describe('QueryCore', () => {
       expect(subscriber).toHaveBeenCalledTimes(3);
     });
 
-     it('should NOT refetch on subscribe if data is fresh', async () => {
+    it('should NOT refetch on subscribe if data is fresh', async () => {
       const freshCachedData = { message: 'fresh cache' };
       const now = Date.now();
       vi.setSystemTime(now - 1000);
@@ -640,12 +665,14 @@ describe('QueryCore', () => {
     it('should notify subscribers of state change after invalidation', async () => {
       await qc.invalidate(endpointKey);
       expect(subscriber).toHaveBeenCalledTimes(1);
-      expect(subscriber).toHaveBeenCalledWith(expect.objectContaining({
-        data: undefined,
-        lastUpdated: undefined,
-        isLoading: false, // Should not be loading after invalidate
-        isError: false,
-      }));
+      expect(subscriber).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: undefined,
+          lastUpdated: undefined,
+          isLoading: false, // Should not be loading after invalidate
+          isError: false,
+        }),
+      );
     });
 
     it('should allow refetching data after invalidation', async () => {
