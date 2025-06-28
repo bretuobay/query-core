@@ -31,19 +31,23 @@ describe('Placeholder Test Suite', () => {
 
   // Example of testing for throws
   it('should correctly assert thrown errors', () => {
-    const throwFn = () => { throw new Error('Test error message'); };
+    const throwFn = () => {
+      throw new Error('Test error message');
+    };
     expect(throwFn).toThrow('Test error message');
   });
 
   it('should correctly assert thrown errors by constructor', () => {
     class CustomError extends Error {}
-    const throwFn = () => { throw new CustomError('Test custom error'); };
+    const throwFn = () => {
+      throw new CustomError('Test custom error');
+    };
     expect(throwFn).toThrow(CustomError);
   });
 });
 
 describe('Another Placeholder Suite', () => {
-    it('should also pass', () => {
-        expect("hello").toEqual("hello");
-    });
+  it('should also pass', () => {
+    expect('hello').toEqual('hello');
+  });
 });

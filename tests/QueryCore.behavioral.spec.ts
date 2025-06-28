@@ -1,4 +1,4 @@
-import { QueryCore, EndpointState } from '../src/QueryCore';
+import QueryCore, { EndpointState } from '../src/QueryCore';
 import { describe, it, expect, beforeEach, afterEach } from './runner/testRunner.js';
 import { mockFetch, resetFetch, getFetchCalls } from './mocks/mockFetch.js';
 import { setupMockLocalStorage, resetMockLocalStorage } from './mocks/mockLocalStorage.js';
@@ -18,7 +18,9 @@ describe('QueryCore - Behavioral Tests', () => {
     currentTime = 1000000000000;
     originalDateNow = Date.now;
     globalThis.Date.now = () => currentTime;
-    globalThis.advanceTime = (ms: number) => { currentTime += ms; };
+    globalThis.advanceTime = (ms: number) => {
+      currentTime += ms;
+    };
 
     setupMockLocalStorage();
     setupMockIndexedDB();
@@ -26,10 +28,14 @@ describe('QueryCore - Behavioral Tests', () => {
 
     qc = new QueryCore();
     // Define endpoint used by most tests in this suite
-    await qc.defineEndpoint(endpointKey, async () => {
-      const res = await fetch(`/${endpointKey}`);
-      return res.json();
-    }, { refetchAfter: 200 }); // Relatively short refetchAfter for some tests
+    await qc.defineEndpoint(
+      endpointKey,
+      async () => {
+        const res = await fetch(`/${endpointKey}`);
+        return res.json();
+      },
+      { refetchAfter: 200 },
+    ); // Relatively short refetchAfter for some tests
   });
 
   afterEach(() => {
@@ -53,7 +59,7 @@ describe('QueryCore - Behavioral Tests', () => {
       if (!state.isLoading && state.data?.content === updatedData.content) sub1FetchCount++;
     });
     // Initial fetch for sub1 (due to no data)
-    await new Promise(r => setTimeout(r, 50)); // let fetch complete
+    await new Promise((r) => setTimeout(r, 50)); // let fetch complete
     expect(sub1State?.data).toEqual(initialData);
     expect(sub1FetchCount).toBe(1); // Initial fetch done
 
@@ -63,7 +69,7 @@ describe('QueryCore - Behavioral Tests', () => {
       if (!state.isLoading && state.data?.content === initialData.content && sub2FetchCount === 0) sub2FetchCount++; // gets initial cache
       if (!state.isLoading && state.data?.content === updatedData.content) sub2FetchCount++; // gets update
     });
-    await new Promise(r => setTimeout(r, 10)); // let subscription provide cached data
+    await new Promise((r) => setTimeout(r, 10)); // let subscription provide cached data
     expect(sub2State?.data).toEqual(initialData); // Gets cached data
     expect(sub2FetchCount).toBe(1);
 
@@ -77,7 +83,7 @@ describe('QueryCore - Behavioral Tests', () => {
     Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
     document.dispatchEvent(new Event('visibilitychange'));
 
-    await new Promise(r => setTimeout(r, 50)); // let refetch complete
+    await new Promise((r) => setTimeout(r, 50)); // let refetch complete
 
     expect(sub1State?.data).toEqual(updatedData);
     expect(sub2State?.data).toEqual(updatedData);
@@ -90,28 +96,31 @@ describe('QueryCore - Behavioral Tests', () => {
   });
 
   it('Rapidly subscribing and unsubscribing', async () => {
-    const manualSpy = (name: string) => { // Moved manualSpy inside the test or make it globally available in test setup
-        let callCount = 0;
-        const calls: any[] = [];
-        const fn = (arg: any) => { callCount++; calls.push(arg); };
-        fn.getCallCount = () => callCount;
-        fn.getCalls = () => calls;
-        return fn;
+    const manualSpy = (name: string) => {
+      // Moved manualSpy inside the test or make it globally available in test setup
+      let callCount = 0;
+      const calls: any[] = [];
+      const fn = (arg: any) => {
+        callCount++;
+        calls.push(arg);
+      };
+      fn.getCallCount = () => callCount;
+      fn.getCalls = () => calls;
+      return fn;
     };
     const spiedCallback1 = manualSpy('cb1');
     const spiedCallback2 = manualSpy('cb2');
 
-
     const unsub1 = qc.subscribe(endpointKey, spiedCallback1);
     // Initial fetch will be triggered by first subscribe
-    await new Promise(r => setTimeout(r, 50)); // Allow fetch to occur
+    await new Promise((r) => setTimeout(r, 50)); // Allow fetch to occur
 
     expect(spiedCallback1.getCallCount()).toBeGreaterThanOrEqual(2); // initial (undefined/cached), loading, success
 
     unsub1(); // Unsubscribe first one
 
     const unsub2 = qc.subscribe(endpointKey, spiedCallback2); // Second subscribes, gets cached data
-    await new Promise(r => setTimeout(r, 10));
+    await new Promise((r) => setTimeout(r, 10));
 
     expect(spiedCallback2.getCallCount()).toBe(1); // Gets current (cached) state
     expect(spiedCallback2.getCalls()[0].data).toEqual(initialData);
@@ -125,26 +134,29 @@ describe('QueryCore - Behavioral Tests', () => {
     expect(spiedCallback1.getCallCount()).toBe(callCount1BeforeNextRefetch); // cb1 is unsubscribed, should not be called
     expect(spiedCallback2.getCallCount()).toBeGreaterThan(1); // cb2 should get loading and then new data
 
-    const lastCallCb2 = spiedCallback2.getCalls()[spiedCallback2.getCallCount()-1];
+    const lastCallCb2 = spiedCallback2.getCalls()[spiedCallback2.getCallCount() - 1];
     expect(lastCallCb2.data).toEqual(updatedData);
 
     unsub2();
   });
 
   it('Handling of network errors during fetch (subscriber perspective)', async (done) => {
-    mockFetch(async () => { throw new Error("Simulated Network Failure"); });
+    mockFetch(async () => {
+      throw new Error('Simulated Network Failure');
+    });
 
     let states: EndpointState<any>[] = [];
     const unsubscribe = qc.subscribe(endpointKey, (state) => {
       states.push(JSON.parse(JSON.stringify(state)));
 
-      if (states.length === 3) { // initial (undef), loading, error
+      if (states.length === 3) {
+        // initial (undef), loading, error
         expect(states[0].isError).toBe(false);
         expect(states[1].isLoading).toBe(true);
         expect(states[2].isLoading).toBe(false);
         expect(states[2].isError).toBe(true);
         expect(states[2].error).toBeInstanceOf(Error);
-        expect(states[2].error.message).toBe("Simulated Network Failure");
+        expect(states[2].error.message).toBe('Simulated Network Failure');
         unsubscribe();
         done();
       }
@@ -156,13 +168,15 @@ describe('QueryCore - Behavioral Tests', () => {
     const endpointFresh = 'freshKey';
     const endpointStale = 'staleKey';
 
-    await qc.defineEndpoint(endpointFresh, async () => ({data: 'fresh_data'}), { refetchAfter: 10000 });
-    await qc.defineEndpoint(endpointStale, async () => ({data: 'stale_data_new'}), { refetchAfter: 100 });
+    await qc.defineEndpoint(endpointFresh, async () => ({ data: 'fresh_data' }), { refetchAfter: 10000 });
+    await qc.defineEndpoint(endpointStale, async () => ({ data: 'stale_data_new' }), { refetchAfter: 100 });
 
     // Fetch both initially
     // @ts-ignore
     globalThis.Date.now = () => 1000000000000;
-    mockFetch(async (url) => (url as string).includes(endpointFresh) ? ({data: 'fresh_data_initial'}) : ({data: 'stale_data_initial'}));
+    mockFetch(async (url) =>
+      (url as string).includes(endpointFresh) ? { data: 'fresh_data_initial' } : { data: 'stale_data_initial' },
+    );
     await qc.refetch(endpointFresh);
     await qc.refetch(endpointStale);
 
@@ -179,14 +193,15 @@ describe('QueryCore - Behavioral Tests', () => {
 
     const fetchCallsBeforeFocus = getFetchCalls().length;
 
-    mockFetch(async (url) => { // Mock new data only for stale endpoint
-        if((url as string).includes(endpointStale)) return ({data: 'stale_data_updated_on_focus'});
-        return ({data: 'fresh_data_initial'}); // Should not be called for freshKey
+    mockFetch(async (url) => {
+      // Mock new data only for stale endpoint
+      if ((url as string).includes(endpointStale)) return { data: 'stale_data_updated_on_focus' };
+      return { data: 'fresh_data_initial' }; // Should not be called for freshKey
     });
 
     Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
     document.dispatchEvent(new Event('visibilitychange'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     expect(getFetchCalls().length).toBe(fetchCallsBeforeFocus + 1); // Only one extra fetch call
     expect(getFetchCalls().pop()?.url).toContain(endpointStale);

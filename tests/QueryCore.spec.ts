@@ -1,14 +1,13 @@
-import { QueryCore, QueryCoreOptions, EndpointOptions, EndpointState } from '../src/QueryCore'; // Adjust path as needed
+import QueryCore, { EndpointOptions } from '../src/QueryCore'; // Adjust path as needed
 import { describe, it, expect, beforeEach, afterEach } from './runner/testRunner.js';
 import { mockFetch, resetFetch, getFetchCalls } from './mocks/mockFetch.js';
-import { setupMockLocalStorage, resetMockLocalStorage, getMockLocalStorageData } from './mocks/mockLocalStorage.js';
+import { setupMockLocalStorage, resetMockLocalStorage } from './mocks/mockLocalStorage.js';
 import {
-    setupMockIndexedDB,
-    resetMockIndexedDB,
-    getMockIndexedDBStore,
-    setMockIndexedDBStore,
-    setMockIndexedDBShouldFail,
-    setMockIndexedDBOperationDelay
+  setupMockIndexedDB,
+  resetMockIndexedDB,
+  getMockIndexedDBStore,
+  setMockIndexedDBStore,
+  setMockIndexedDBShouldFail,
 } from './mocks/mockIndexedDB.js';
 
 describe('QueryCore - Endpoint Definition and Configuration', () => {
@@ -58,7 +57,9 @@ describe('QueryCore - Endpoint Definition and Configuration', () => {
     expect(endpointDefinition.options.refetchAfter).toBe(5000); // Custom overrides global
     expect(endpointDefinition.options.cacheProvider).toBe('indexedDB');
     // @ts-ignore
-    expect(endpointDefinition.cache instanceof (await import('./mocks/mockIndexedDB.js')).MockIndexedDBCacheProvider).toBeFalsy(); // This needs to be more specific to the actual class from the source if possible, or check type
+    expect(
+      endpointDefinition.cache instanceof (await import('./mocks/mockIndexedDB.js')).MockIndexedDBCacheProvider,
+    ).toBeFalsy(); // This needs to be more specific to the actual class from the source if possible, or check type
   });
 
   it('should use global cacheProvider if endpoint-specific one is not provided', async () => {
@@ -76,7 +77,6 @@ describe('QueryCore - Endpoint Definition and Configuration', () => {
     const { IndexedDBCacheProvider } = await import('../src/cacheProviders/IndexedDBCacheProvider.js');
     expect(cacheInstance instanceof IndexedDBCacheProvider).toBeTruthy();
   });
-
 
   it('should allow overriding global QueryCoreOptions at endpoint definition', async () => {
     qc = new QueryCore({ cacheProvider: 'localStorage', defaultRefetchAfter: 60000 });
@@ -150,7 +150,9 @@ describe('QueryCore - Fetcher Invocation and Promise Handling', () => {
   it('should set isLoading state during fetch operation', async () => {
     const mockData = { value: 'test' };
     let resolveFetch: (value: unknown) => void;
-    const fetchingPromise = new Promise(resolve => { resolveFetch = resolve; });
+    const fetchingPromise = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
 
     const fetcher = async () => {
       await fetchingPromise;
@@ -260,7 +262,7 @@ describe('QueryCore - Caching (IndexedDB)', () => {
 
   it('should load initial data from IndexedDB if available', async () => {
     // Pre-populate mock IndexedDB
-    const itemToStore = { key: endpointKey, value: { data: mockData, lastUpdated: Date.now() - 1000 }};
+    const itemToStore = { key: endpointKey, value: { data: mockData, lastUpdated: Date.now() - 1000 } };
     setMockIndexedDBStore({ [endpointKey]: itemToStore }); // Use mock helper
 
     const newQc = new QueryCore({ cacheProvider: 'indexedDB' });
@@ -358,12 +360,12 @@ describe('QueryCore - State Management and Subscription', () => {
     // Re-initialize QueryCore and define endpoint to load from cache
     qc = new QueryCore(); // fresh instance
     qc.defineEndpoint(endpointKey, async () => updatedData).then(() => {
-        qc.subscribe(endpointKey, (state) => {
-            expect(state.data).toEqual(initialData);
-            expect(state.isLoading).toBe(false);
-            expect(state.isError).toBe(false);
-            done(); // End test after first callback
-        });
+      qc.subscribe(endpointKey, (state) => {
+        expect(state.data).toEqual(initialData);
+        expect(state.isLoading).toBe(false);
+        expect(state.isError).toBe(false);
+        done(); // End test after first callback
+      });
     });
   });
 
@@ -373,12 +375,15 @@ describe('QueryCore - State Management and Subscription', () => {
     let callCount = 0;
     qc.subscribe(endpointKey, (state) => {
       callCount++;
-      if (callCount === 1) { // Initial state (empty or from cache - likely empty here)
+      if (callCount === 1) {
+        // Initial state (empty or from cache - likely empty here)
         expect(state.isLoading).toBe(false); // or true if fetch is immediate from define
-      } else if (callCount === 2) { // Loading state
+      } else if (callCount === 2) {
+        // Loading state
         expect(state.isLoading).toBeTruthy();
         expect(state.data).toBe(undefined); // Or previous data if cache existed
-      } else if (callCount === 3) { // Success state
+      } else if (callCount === 3) {
+        // Success state
         expect(state.isLoading).toBe(false);
         expect(state.isError).toBe(false);
         expect(state.data).toEqual(updatedData);
@@ -390,8 +395,10 @@ describe('QueryCore - State Management and Subscription', () => {
   });
 
   it('should notify subscribers on fetch error', (done) => {
-    const errorMessage = "Fetch failed";
-    mockFetch(() => { throw new Error(errorMessage); }); // Make fetcher throw
+    const errorMessage = 'Fetch failed';
+    mockFetch(() => {
+      throw new Error(errorMessage);
+    }); // Make fetcher throw
 
     // Need to redefine endpoint with a fetcher that uses the global mockFetch
     // Or, ensure the original fetcher for 'stateTest' in beforeEach will throw.
@@ -400,21 +407,22 @@ describe('QueryCore - State Management and Subscription', () => {
     // Let's redefine for this test.
     qc = new QueryCore(); // New instance
     const errorFetcher = async () => {
-        // This fetcher will be called by QueryCore's refetch
-        // It needs to simulate what mockFetch would do if it were global fetch
-        const response = await window.fetch("test_url"); // This call will be intercepted by mockFetch
-        if(!response.ok) throw new Error(await response.json()); // or similar error handling
-        return response.json();
+      // This fetcher will be called by QueryCore's refetch
+      // It needs to simulate what mockFetch would do if it were global fetch
+      const response = await window.fetch('test_url'); // This call will be intercepted by mockFetch
+      if (!response.ok) throw new Error(await response.json()); // or similar error handling
+      return response.json();
     };
     qc.defineEndpoint(endpointKey, errorFetcher);
-
 
     let callCount = 0;
     qc.subscribe(endpointKey, (state) => {
       callCount++;
-      if (callCount === 2) { // Loading state
+      if (callCount === 2) {
+        // Loading state
         expect(state.isLoading).toBeTruthy();
-      } else if (callCount === 3) { // Error state
+      } else if (callCount === 3) {
+        // Error state
         expect(state.isLoading).toBe(false);
         expect(state.isError).toBeTruthy();
         expect(state.error).toBeInstanceOf(Error);
@@ -432,7 +440,7 @@ describe('QueryCore - State Management and Subscription', () => {
 
     // Adjust mockFetch to throw an error that will be caught by errorFetcher
     mockFetch(async () => {
-        throw new Error(errorMessage);
+      throw new Error(errorMessage);
     });
 
     qc.refetch(endpointKey);
@@ -502,10 +510,12 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
     let currentTime = 1000000000000; // A fixed start time
     const originalDateNow = Date.now;
     globalThis.Date.now = () => currentTime;
-    globalThis.advanceTime = (ms: number) => { currentTime += ms; };
+    globalThis.advanceTime = (ms: number) => {
+      currentTime += ms;
+    };
     globalThis.resetTime = () => {
-        currentTime = 1000000000000;
-        Date.now = originalDateNow; // Restore original Date.now
+      currentTime = 1000000000000;
+      Date.now = originalDateNow; // Restore original Date.now
     };
 
     qc = new QueryCore();
@@ -542,11 +552,14 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
 
     qc.subscribe(endpointKey, (state) => {
       callCount++;
-      if (callCount === 1) { // Initial state from stale cache
+      if (callCount === 1) {
+        // Initial state from stale cache
         expect(state.data).toEqual(initialData);
-      } else if (callCount === 2 && state.isLoading) { // Loading state due to stale data
+      } else if (callCount === 2 && state.isLoading) {
+        // Loading state due to stale data
         expect(getFetchCalls().length).toBe(fetchCallsBeforeSubscribe + 1); // Fetch triggered
-      } else if (callCount === 3 && !state.isLoading && !state.isError) { // Updated state
+      } else if (callCount === 3 && !state.isLoading && !state.isError) {
+        // Updated state
         expect(state.data).toEqual(newData);
         done();
       }
@@ -567,7 +580,7 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
     // Subscribe to make it "observed"
     let focusRefetchData: any;
     qc.subscribe(endpointKey, (state) => {
-        if (state.data?.value === 'new_focused_data') focusRefetchData = state.data;
+      if (state.data?.value === 'new_focused_data') focusRefetchData = state.data;
     });
 
     // Advance time but not enough to be stale for normal refetchAfter
@@ -575,31 +588,29 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
     globalThis.Date.now = () => firstFetchTime + refetchAfterMs / 2;
 
     // Simulate window focus
-    mockFetch(() => ({data: {value: 'new_focused_data'}, status: 200})); // New data for this fetch
+    mockFetch(() => ({ data: { value: 'new_focused_data' }, status: 200 })); // New data for this fetch
     Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
     document.dispatchEvent(new Event('visibilitychange'));
 
     // Wait for potential async operations from refetch triggered by event
-    await new Promise(r => setTimeout(r, 50)); // Small delay for event loop / async refetch
+    await new Promise((r) => setTimeout(r, 50)); // Small delay for event loop / async refetch
 
     // It should NOT refetch because data is not stale according to refetchAfter
     expect(focusRefetchData).toBe(undefined);
     expect(qc.getState(endpointKey).lastUpdated).toBe(firstFetchTime); // lastUpdated should not change
-
 
     // Now make data stale
     // @ts-ignore
     globalThis.Date.now = () => firstFetchTime + refetchAfterMs + 1;
     Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
     document.dispatchEvent(new Event('visibilitychange'));
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
-    expect(focusRefetchData).toEqual({value: 'new_focused_data'});
+    expect(focusRefetchData).toEqual({ value: 'new_focused_data' });
     expect(qc.getState(endpointKey).lastUpdated).toBeGreaterThan(firstFetchTime);
 
     Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); // cleanup
   });
-
 
   it('should refetch on network reconnect if observed (forced)', async () => {
     await qc.defineEndpoint(endpointKey, async () => newData, { refetchAfter: 100000 }); // Long refetchAfter
@@ -612,29 +623,29 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
 
     let onlineRefetchData: any;
     qc.subscribe(endpointKey, (state) => {
-        if (state.data?.value === 'new_online_data') onlineRefetchData = state.data;
+      if (state.data?.value === 'new_online_data') onlineRefetchData = state.data;
     });
 
     // Data is fresh, but network reconnect should force refetch
-    mockFetch(() => ({data: {value: 'new_online_data'}, status: 200}));
+    mockFetch(() => ({ data: { value: 'new_online_data' }, status: 200 }));
     window.dispatchEvent(new Event('online'));
 
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
-    expect(onlineRefetchData).toEqual({value: 'new_online_data'});
+    expect(onlineRefetchData).toEqual({ value: 'new_online_data' });
     expect(qc.getState(endpointKey).lastUpdated).toBeGreaterThan(firstFetchTime);
   });
 
   it('should NOT refetch on subscribe if data is fresh', async () => {
     const refetchAfterMs = 1000;
-     // @ts-ignore
+    // @ts-ignore
     globalThis.Date.now = () => 1000000000000; // Initial time for cache set
     localStorage.setItem(`QueryCore_${endpointKey}`, JSON.stringify({ data: initialData, lastUpdated: Date.now() }));
 
     qc = new QueryCore();
     await qc.defineEndpoint(endpointKey, async () => newData, { refetchAfter: refetchAfterMs });
 
-     // @ts-ignore
+    // @ts-ignore
     globalThis.Date.now = () => 1000000000000 + refetchAfterMs / 2; // Data is fresh
 
     const fetchCallsBeforeSubscribe = getFetchCalls().length;
@@ -645,7 +656,7 @@ describe('QueryCore - Automatic Refetching Mechanisms', () => {
       expect(state.data).toEqual(initialData); // Should only receive cached data
     });
 
-    await new Promise(r => setTimeout(r, 10)); // allow microtasks to run
+    await new Promise((r) => setTimeout(r, 10)); // allow microtasks to run
 
     expect(getFetchCalls().length).toBe(fetchCallsBeforeSubscribe); // No new fetch
     expect(wasLoading).toBe(false); // Should not have entered loading state
