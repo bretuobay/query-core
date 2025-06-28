@@ -1,37 +1,163 @@
-.App {
+body {
   font-family: sans-serif;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.App-header {
-  text-align: center;
-  margin-bottom: 20px;
+  margin: 0;
+  background-color: #f4f4f4;
   color: #333;
 }
 
-input[type='text'] {
-  padding: 8px;
-  margin-right: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex-grow: 1;
+.App {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-button {
-  padding: 8px 15px;
-  background-color: #007bff;
-  color: white;
+nav {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start; /* Align to the left */
+  align-items: center;
+}
+
+nav ul li {
+  margin-right: 20px; /* Spacing between items */
+}
+
+nav ul li:last-child {
+  margin-right: 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+nav ul li a:hover, nav ul li a.active {
+  background-color: #e9ecef;
+  text-decoration: none;
+}
+
+
+h1, h2 {
+  color: #333;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Styling for post items in PostsList */
+.posts-list li {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.posts-list li h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.2em;
+}
+
+.posts-list li p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #555;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.dashboard-card {
+  background-color: #e9ecef;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.dashboard-card h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.dashboard-card p, .dashboard-card ul {
+  font-size: 1em;
+  color: #555;
+}
+
+.dashboard-card ul {
+  padding-left: 20px; /* Indent user post counts */
+}
+
+.dashboard-card ul li {
+  margin-bottom: 8px;
+  background-color: transparent;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  padding: 0;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+/* Detail view specific styling */
+.post-detail-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
+
+.post-detail-container h1 {
+  font-size: 1.8em;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.post-detail-container p {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.post-detail-container small {
+  font-size: 0.85em;
+  color: #777;
+  display: block; /* Make small tags take their own line if needed */
+  margin-top: 5px;
+}
+
+/* General list item reset for dashboard, if needed */
+.dashboard-card ul li {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 5px;
+}
+
+/* Adding class to PostDetail main div for specific styling */
+/* In PostDetail.tsx, change root div to <div className="post-detail-container"> */
+/* Adding class to PostsList ul for specific styling */
+/* In PostsList.tsx, change ul to <ul className="posts-list"> */

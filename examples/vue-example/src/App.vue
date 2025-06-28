@@ -1,107 +1,71 @@
 <template>
   <div id="app-container">
-    <header>
-      <h1>Vue 3 Posts</h1>
-    </header>
+    <nav>
+      <router-link to="/">Dashboard</router-link>
+      <router-link to="/posts">Posts</router-link>
+    </nav>
     <main>
-      <div v-if="postsState.isLoading">Loading posts...</div>
-      <div v-else-if="postsState.isError">
-        Error fetching posts: {{ postsState.error?.message || 'Unknown error' }}
-      </div>
-      <ul v-else-if="postsState.data && postsState.data.length > 0">
-        <li v-for="post in postsState.data" :key="post.id">
-          <h2>{{ post.title }}</h2>
-          <p>{{ post.body }}</p>
-        </li>
-      </ul>
-      <div v-else>No posts found.</div>
+      <router-view />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { QueryCore } from 'query-core-client';
-import type { EndpointState } from 'query-core-client'; // Use type-only import
-
-// Define the type for a Post
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-}
-
-// Create a single QueryCore instance
-const queryCore = new QueryCore();
-const POSTS_ENDPOINT_KEY = 'posts';
-
-async function fetchPosts(): Promise<Post[]> {
-  const response = await fetch('https://jsonplaceholder.typicode.com/posts');
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json();
-}
-
-// Reactive state for posts
-const postsState = ref<EndpointState<Post[]>>({
-  data: undefined,
-  isLoading: true,
-  isError: false,
-  error: undefined,
-  lastUpdated: undefined,
-});
-
-let unsubscribe: (() => void) | undefined;
-
-onMounted(async () => {
-  // Define the endpoint
-  await queryCore.defineEndpoint<Post[]>(POSTS_ENDPOINT_KEY, fetchPosts);
-
-  // Subscribe to the endpoint
-  unsubscribe = queryCore.subscribe<Post[]>(POSTS_ENDPOINT_KEY, (state) => {
-    postsState.value = state;
-  });
-
-  // Initial fetch if not already loading or data not present
-  const currentState = queryCore.getState<Post[]>(POSTS_ENDPOINT_KEY);
-  if (!currentState.isLoading && !currentState.data) {
-    queryCore.refetch<Post[]>(POSTS_ENDPOINT_KEY);
-  }
-});
-
-onUnmounted(() => {
-  if (unsubscribe) {
-    unsubscribe();
-  }
-});
+// No script logic needed in App.vue anymore as it's handled by individual routed components
 </script>
 
 <style>
+/* Global styles can remain here or be moved to a more global CSS file like main.css or style.css */
 body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin: 0;
-  padding: 20px;
+  background-color: #f4f4f4; /* Added background for better contrast with app container */
 }
 
 #app-container {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 960px; /* Increased max-width for better layout */
+  margin: 20px auto;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-header {
-  text-align: center;
+nav {
+  display: flex;
+  justify-content: flex-start; /* Align to the left */
+  align-items: center;
+  padding-bottom: 10px;
   margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
 }
 
-header h1 {
-  color: #333;
+nav a {
+  margin-right: 20px; /* Spacing between items */
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+nav a:last-child {
+  margin-right: 0;
+}
+
+nav a.router-link-exact-active {
+  background-color: #e9ecef;
+  color: #0056b3;
+}
+
+nav a:hover {
+  background-color: #f8f9fa;
+}
+
+main {
+  /* Styles for the main content area where router-view renders */
 }
 </style>
