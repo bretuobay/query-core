@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QueryCore Test Suite</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #test-results {
+      border: 1px solid #ccc;
+      padding: 10px;
+      max-height: 80vh;
+      overflow-y: auto;
+      white-space: pre; /* Preserve whitespace for stack traces */
+    }
+    h1 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>QueryCore Test Suite</h1>
+  <div id="test-results">
+    <p>Loading tests...</p>
+  </div>
+
+  <!-- Load QueryCore library (adjust path as needed if vite builds differently) -->
+  <!-- For development with Vite, it's easier to import from source -->
+
+  <script type="module">
+    import { runTests } from './runner/testRunner.js'; // .js extension for browser modules
+
+    // Dynamically import all test spec files
+    // This is a simple approach. For many files, a build step or more robust import is better.
+    // Vite handles .ts imports directly in dev mode.
+    async function importTestModules() {
+      // Add test files here as they are created
+      // e.g., await import('./QueryCore.spec.js');
+      // e.g., await import('./cacheProviders/LocalStorageCacheProvider.spec.js');
+      await import('./placeholder.spec.js'); // Keep placeholder for runner verification
+      await import('./QueryCore.spec.js');
+      await import('./QueryCore.integration.spec.js');
+      await import('./QueryCore.behavioral.spec.js'); // Add the new behavioral tests
+    }
+
+    async function main() {
+      try {
+        await importTestModules(); // Load all test definitions
+        await runTests(); // Execute them
+      } catch (error) {
+        const resultsDiv = document.getElementById('test-results');
+        if (resultsDiv) {
+            const p = document.createElement('p');
+            p.textContent = 'ERROR loading or running tests: ' + error.message;
+            p.style.color = 'red';
+            resultsDiv.appendChild(p);
+        }
+        console.error("Error loading or running tests:", error);
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>
