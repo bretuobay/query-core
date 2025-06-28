@@ -1,6 +1,10 @@
 <template>
   <div>
     <h1>Dashboard</h1>
+    <!-- incase of error errorPosts -->
+    <div v-if="isErrorPosts">
+      <p>Error loading posts: {{ errorPosts?.message || 'Unknown error' }}</p>
+    </div>
     <div class="dashboard-card">
       <h2>Total Posts</h2>
       <p v-if="isLoadingPosts">Loading...</p>
@@ -12,9 +16,7 @@
       <p v-if="isLoadingPosts">Loading...</p>
       <p v-else-if="isErrorPosts">Error loading user data.</p>
       <ul v-else-if="Object.keys(userPostCounts).length > 0">
-        <li v-for="(count, userId) in userPostCounts" :key="userId">
-          User ID {{ userId }}: {{ count }} posts
-        </li>
+        <li v-for="(count, userId) in userPostCounts" :key="userId">User ID {{ userId }}: {{ count }} posts</li>
       </ul>
       <p v-else>No user post data available.</p>
     </div>
@@ -23,7 +25,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { queryCore, fetchPosts, POSTS_ENDPOINT_KEY, Post, EndpointState } from '../queryClient';
+import { queryCore, fetchPosts, POSTS_ENDPOINT_KEY, type Post, type EndpointState } from '../queryClient';
 
 interface UserPostCounts {
   [userId: number]: number;
@@ -71,12 +73,11 @@ const userPostCounts = computed<UserPostCounts>(() => {
     return {};
   }
   const counts: UserPostCounts = {};
-  postsState.value.data.forEach(post => {
+  postsState.value.data.forEach((post) => {
     counts[post.userId] = (counts[post.userId] || 0) + 1;
   });
   return counts;
 });
-
 </script>
 
 <style scoped>

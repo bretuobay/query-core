@@ -14,9 +14,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { ref, onUnmounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { queryCore, fetchPostById, POST_DETAIL_ENDPOINT_KEY_PREFIX, Post, EndpointState } from '../queryClient';
+import {
+  queryCore,
+  fetchPostById,
+  POST_DETAIL_ENDPOINT_KEY_PREFIX,
+  type Post,
+  type EndpointState,
+} from '../queryClient';
 
 const route = useRoute();
 const postId = computed(() => route.params.id as string);
@@ -64,12 +70,15 @@ async function setupEndpoint(id: string) {
   }
 }
 
-watch(postId, (newId, oldId) => {
-  if (newId && newId !== oldId) {
-    setupEndpoint(newId);
-  }
-}, { immediate: true }); // immediate: true to run on component mount
-
+watch(
+  postId,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      setupEndpoint(newId);
+    }
+  },
+  { immediate: true },
+); // immediate: true to run on component mount
 
 onUnmounted(() => {
   if (unsubscribe) {
@@ -86,7 +95,6 @@ const isLoading = computed(() => postState.value.isLoading);
 const isError = computed(() => postState.value.isError);
 const error = computed(() => postState.value.error);
 const post = computed(() => postState.value.data);
-
 </script>
 
 <style scoped>
@@ -94,7 +102,7 @@ const post = computed(() => postState.value.data);
   padding: 20px;
   background-color: #fff;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 .post-detail-container h1 {
   font-size: 1.8em;
