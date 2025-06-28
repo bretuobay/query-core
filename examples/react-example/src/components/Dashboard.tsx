@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
         setPostsState(state);
         if (state.data) {
           const counts: UserPostCounts = {};
-          state.data.forEach(post => {
+          state.data.forEach((post) => {
             counts[post.userId] = (counts[post.userId] || 0) + 1;
           });
           setUserPostCounts(counts);
@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
       // Initial fetch if not already loading or data not present
       const currentState = queryCore.getState<Post[]>(POSTS_ENDPOINT_KEY);
       if (!currentState.isLoading && !currentState.data) {
-         queryCore.refetch<Post[]>(POSTS_ENDPOINT_KEY);
+        queryCore.refetch<Post[]>(POSTS_ENDPOINT_KEY);
       }
     }
 
@@ -57,22 +57,26 @@ const Dashboard: React.FC = () => {
   }
 
   if (postsState.isError) {
-    return <div className="text-center mt-2 error-message">Error loading dashboard: {postsState.error?.message || 'Unknown error'}</div>;
+    return (
+      <div className="text-center mt-2 error-message">
+        Error loading dashboard: {postsState.error?.message || 'Unknown error'}
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-container">
       <div className="card">
         <h2 className="card-title">Total Posts</h2>
-        <div className="card-content">
-          {postsState.data ? <p>{postsState.data.length}</p> : <p>0</p>}
+        <div className="card-content dashboard-total-posts">
+          {postsState.data ? <p>{postsState.data.length} posts</p> : <p>0</p>}
         </div>
       </div>
       <div className="card">
         <h2 className="card-title">Posts per User</h2>
         <div className="card-content">
           {Object.keys(userPostCounts).length > 0 ? (
-            <ul>
+            <ul className="list">
               {Object.entries(userPostCounts).map(([userId, count]) => (
                 <li key={userId}>
                   User ID {userId}: {count} posts

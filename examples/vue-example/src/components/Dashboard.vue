@@ -7,17 +7,15 @@
     <template v-else>
       <div class="card">
         <h2 class="card-title">Total Posts</h2>
-        <div class="card-content">
-          <p>{{ postsCount }}</p>
+        <div class="card-content dashboard-total-posts">
+          <p>{{ postsCount }} posts</p>
         </div>
       </div>
       <div class="card">
         <h2 class="card-title">Posts per User</h2>
         <div class="card-content">
-          <ul v-if="Object.keys(userPostCounts).length > 0">
-            <li v-for="(count, userId) in userPostCounts" :key="userId">
-              User ID {{ userId }}: {{ count }} posts
-            </li>
+          <ul v-if="Object.keys(userPostCounts).length > 0" class="list">
+            <li v-for="(count, userId) in userPostCounts" :key="userId">User ID {{ userId }}: {{ count }} posts</li>
           </ul>
           <p v-else>No user post data available.</p>
         </div>

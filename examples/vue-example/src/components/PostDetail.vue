@@ -105,10 +105,5 @@ const post = computed(() => postState.value.data);
    If there are specific styles for this component that don't belong
    in the shared system, they can remain here. */
 
-.post-meta { /* Example of a specific style that might remain if not in shared */
-  display: block;
-  margin-top: 5px;
-  font-size: 0.9em;
-  color: #666;
-}
+/* .post-meta styling is now in shared-styles.css */
 </style>
